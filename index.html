@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <script src="index.js"></script>
     <link rel="stylesheet" href="./index.css"/>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,12 +10,12 @@
     <title>Document</title>
 </head>
 
-<body>
+<body onload="main()">
     <div class="addtaskcontainer">
         <div class="addtask">
             Add a task:
-            <input style="width: 30%;" name="taskinput" type="text" maxlength="30" placeholder="Enter task details here"/>
-            <button>Finish</button>
+            <input autocomplete="off" id="taskInput" style="width: 30%;" name="taskinput" type="text" maxlength="30" placeholder="Enter task details here"/>
+            <button id ="submitBtn">Submit</button>
         </div>
     </div>
     <div class="grid-container">
