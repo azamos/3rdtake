@@ -4,6 +4,9 @@ const state = {
     tasks: [],
     submitBtnEnabled: false
 }
+const MANUAL = 'Manually decide task order';
+const DUE_DATE ='Sort by due date';
+const SOTRING_OPTIONS = {MANUAL,DUE_DATE};
 
 const subBtnStateNeedsToChange = () => {
     const {inputValue,submitBtnEnabled} = state;
@@ -23,8 +26,15 @@ function main(){
 
     const tasksContainer = document.getElementById('tasksAnchor');
     const templateRef = document.getElementsByClassName('template')[0];
-    submitBtn.addEventListener('click',e=>submitBtnHandler(e,templateRef,tasksContainer));
+    submitBtn.addEventListener('click',e=>submitBtnHandler(e,templateRef,tasksContainer,inputRef));
 }
+
+const resetInputValue = (inputHTMLref,subBtnHTMLref) => {
+    state.inputValue="";
+    inputHTMLref.value = state.inputValue;
+    subBtnHTMLref.setAttribute('disabled',true);
+    state.submitBtnEnabled = false;
+};
 
 const inputChangedHandler = (e,btn) => {
     const newValue =  e.target.value;
@@ -40,7 +50,8 @@ const inputChangedHandler = (e,btn) => {
         }
     }
 }
-const submitBtnHandler = (e,taskTemplate,anchorPoint) => {
+const submitBtnHandler = (e,taskTemplate,anchorPoint,inputHTMLref) => {
+    const subBtnRef = e.target;
     const newTask = taskTemplate.cloneNode(true);
     const newIndex = state.tasks.length;
     const {children} = newTask;
@@ -61,14 +72,38 @@ const submitBtnHandler = (e,taskTemplate,anchorPoint) => {
     deleteBtn.addEventListener('click',e=>deleteTask(e,anchorPoint,newTaskData))
     state.tasks.push(newTaskData);
 
-    const upBtn = buttons[0];
-    const dnBtn = buttons[1];
-    if(newIndex==0){
-        upBtn.setAttribute('disabled',true);
-    }
+    setValidBtns(newTaskData);
     if(newIndex>0){
-        console.log(state.tasks[newIndex-1].HTMLRef.children[2].children[1]);
-        state.tasks[newIndex-1].HTMLRef.children[2].children[1].removeAttribute('disabled');
+        setValidBtns(state.tasks[newIndex-1]);
+    }
+    resetInputValue(inputHTMLref,subBtnRef);
+};
+
+const setValidBtns = task => {
+    const {index,HTMLRef} = task;
+    const buttons = HTMLRef.children[2].children;
+    console.log('btns');
+    console.log(buttons);
+    const upbtn = buttons[0];
+    const dnbtn = buttons[1];
+
+    const { tasks } = state;
+    const n = tasks.length;
+    if(n==0){
+        throw new Error("logic is flawed. this function should not be called if tasklist is empty");
+    }
+    if(n==1){//If we got around to a single task, it cannot go up or down.
+        upbtn.setAttribute('disabled',true);
+        dnbtn.setAttribute('disabled',true);  
+        return;  
+    }
+    else{//If n>1
+        if(index<n-1){//Means, we can go down
+            dnbtn.removeAttribute('disabled');
+        }
+        if(index>0){//if more then one task, all the tasks bellow it can go up
+            upbtn.removeAttribute('disabled');
+        }
     }
 };
 
@@ -76,7 +111,23 @@ const deleteTask = (e,anchor,newTaskData) => {
     
     anchor.removeChild(newTaskData.HTMLRef);
     state.tasks.splice(newTaskData.index,1);
+    //Update indexes
+    const n = state.tasks.length;
+    let i;
+    for(i=0;i<n;i++){
+        state.tasks[i].setIndex(i);
+        state.tasks[i].HTMLRef.children[0].innerText = `TASK#${i+1}`;
+        setValidBtns(state.tasks[i]);
+    }
 }
+
+// const renderTasks = anchorPoint => {
+//     const { tasks } = state;
+//     const taskNodeList = tasks.map(task=>createHTMLtaskElement(task));
+//     taskNodeList.forEach(element => {
+//         anchorPoint.appendChild(element);
+//     });
+// };
 
 //For clarity
 class Task{
@@ -88,5 +139,8 @@ class Task{
     }
     setHTMLRef(val){
         this.HTMLRef = val;
+    }
+    setIndex(newVal){
+        this.index = newVal;
     }
 }
