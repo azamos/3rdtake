@@ -14,7 +14,6 @@ const subBtnStateNeedsToChange = () => {
         || (inputValue.trim()!=''&& !submitBtnEnabled); 
 }
 
-
 function main(){
     console.log("document.body has loaded");
     console.log("initial state is: ",state);
@@ -63,6 +62,7 @@ const submitBtnHandler = (e,taskTemplate,anchorPoint,inputHTMLref) => {
     const buttons = children[2].children;
     const deleteBtn = buttons[2];
 
+
     newTask.classList.remove('hidden');
     newTask.setAttribute('id',newTaskData.id);
     anchorPoint.append(newTask);
@@ -77,6 +77,9 @@ const submitBtnHandler = (e,taskTemplate,anchorPoint,inputHTMLref) => {
         setValidBtns(state.tasks[newIndex-1]);
     }
     resetInputValue(inputHTMLref,subBtnRef);
+
+    const dnbtn = buttons[1];
+    dnbtn.addEventListener('click',e=>swapDn(e,newTaskData));
 };
 
 const setValidBtns = task => {
@@ -119,6 +122,30 @@ const deleteTask = (e,anchor,newTaskData) => {
         state.tasks[i].HTMLRef.children[0].innerText = `TASK#${i+1}`;
         setValidBtns(state.tasks[i]);
     }
+}
+
+//Assumption: since btn is only clickable when valid, no need to check if task have a task below it
+const swapDn = (e,task) => 
+{
+    const task2 = state.tasks[task.index+1];
+    swapNeighbours(task,task2);
+}
+//Assumption: task1 and task1 are indeed two neighbours that can be swapped, where task1 is the upper one
+function swapNeighbours(task1,task2){
+    //first, data representation swap
+    const { tasks } = state;
+    const index1 = task1.index;
+    const index2 = task2.index;
+    tasks[index1] = task2;
+    tasks[index2] = task1;
+    tasks[index1].setIndex(index1);
+    tasks[index2].setIndex(index2);
+
+    //second, HTML elements swap
+    const parent = task2.HTMLRef.parentNode;
+    parent.insertBefore(task2.HTMLRef,task1.HTMLRef);
+    setValidBtns(task1);
+    setValidBtns(task2);
 }
 
 // const renderTasks = anchorPoint => {
