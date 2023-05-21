@@ -80,6 +80,8 @@ const submitBtnHandler = (e,taskTemplate,anchorPoint,inputHTMLref) => {
 
     const dnbtn = buttons[1];
     dnbtn.addEventListener('click',e=>swapDn(e,newTaskData));
+    const upbtn = buttons[0];
+    upbtn.addEventListener('click',e=>swapUp(e,newTaskData));
 };
 
 const setValidBtns = task => {
@@ -107,6 +109,12 @@ const setValidBtns = task => {
         if(index>0){//if more then one task, all the tasks bellow it can go up
             upbtn.removeAttribute('disabled');
         }
+        if(index==n-1){
+            dnbtn.setAttribute('disabled',true);
+        }
+        if(index==0){
+            upbtn.setAttribute('disabled',true);
+        }
     }
 };
 
@@ -130,6 +138,9 @@ const swapDn = (e,task) =>
     const task2 = state.tasks[task.index+1];
     swapNeighbours(task,task2);
 }
+
+const swapUp = (e,task) => swapNeighbours(state.tasks[task.index-1],task);
+
 //Assumption: task1 and task1 are indeed two neighbours that can be swapped, where task1 is the upper one
 function swapNeighbours(task1,task2){
     //first, data representation swap
@@ -140,6 +151,9 @@ function swapNeighbours(task1,task2){
     tasks[index2] = task1;
     tasks[index1].setIndex(index1);
     tasks[index2].setIndex(index2);
+    tasks[index1].HTMLRef.children[0].innerText = `TASK#${index1+1}`;
+    tasks[index2].HTMLRef.children[0].innerText = `TASK#${index2+1}`;
+
 
     //second, HTML elements swap
     const parent = task2.HTMLRef.parentNode;
