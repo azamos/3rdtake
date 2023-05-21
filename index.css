@@ -24,13 +24,13 @@
   justify-content: space-evenly;
   margin: 30px;
   gap: 10px;
+  padding: 30px;
   border: 1px solid white;
   box-shadow: 3px 3px 3px 3px gray;
   width: 60%;
   font-size: 50px;
   color: white;
   background: rgb(33,150,243);
-  background: radial-gradient(circle, rgba(33,150,243,1) 0%, rgba(255,166,0,1) 100%); 
 }
 .addtaskcontainer{
   display: flex;
@@ -40,4 +40,15 @@
 .hidden{
   display: none;
   visibility: hidden;
+}
+.redbg{
+  background-color: rgba(255, 49, 49, 0.979);
+  color: white;
+}
+.whitebg{
+  background-color: white;
+}
+.transparent{
+  background-color: transparent;
+  border: 0px;
 }
