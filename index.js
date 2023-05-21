@@ -11,7 +11,10 @@ function main(){
     inputRef.value = state.inputValue;
     const submitBtn = document.getElementById("submitBtn");
     inputRef.addEventListener('input',inputChangedHandler);
-    submitBtn.addEventListener('click',submitBtnHandler);
+
+    const tasksContainer = document.getElementById('tasksAnchor');
+    const templateRef = document.getElementsByClassName('template')[0];
+    submitBtn.addEventListener('click',e=>submitBtnHandler(e,templateRef,tasksContainer));
 }
 
 const inputChangedHandler = e => {
@@ -19,7 +22,19 @@ const inputChangedHandler = e => {
     state.inputValue = e.target.value;
     e.target.value = state.inputValue;
 }
-const submitBtnHandler = e => console.log(state);
+const submitBtnHandler = (e,taskTemplate,anchorPoint) => {
+    const newTask = taskTemplate.cloneNode(true);
+    const newTaskData = new Task(state.tasks.length+1,state.inputValue);
+    state.tasks.push(newTaskData);
+
+    const children = Array.from(newTask.childNodes).filter(item=>item.nodeName == "DIV");
+    children[0].innerText = `TASK #${newTaskData.order}`;
+    children[1].innerText = newTaskData.content;
+
+    newTask.classList.remove('hidden');
+
+    anchorPoint.append(newTask);
+};
 
 //For clarity
 class Task{
