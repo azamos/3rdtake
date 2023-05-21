@@ -13,8 +13,9 @@
   justify-self: center;
 }
 .title{
-  background-color: #2196F3;
+  background: rgb(33,150,243);
   color: white;
+  border: 0.1vmin solid white;
   border-bottom: 0.1vmin solid black;
 }
 .addtask{
@@ -42,7 +43,7 @@
   visibility: hidden;
 }
 .redbg{
-  background-color: rgba(255, 49, 49, 0.979);
+  background: rgb(255,0,0);
   color: white;
 }
 .whitebg{
@@ -51,4 +52,26 @@
 .transparent{
   background-color: transparent;
   border: 0px;
+}
+.sbtbt{
+  background-color: white;
+  font-size: xx-large;
+}
+.sbtbt:hover:enabled{
+  background-color: rgb(251, 149, 6);
+  color: white;
+  box-shadow: 1px 1px 10px 1px white;
+}
+.btn:hover:enabled{
+  background-color: rgb(182, 24, 24);
+  color: white;
+  box-shadow: 1px 1px 10px 1px white;
+}
+.delete-btn:hover:enabled{
+  background-color: white;
+  color: red;
+  box-shadow: 1px 1px 10px 1px rgb(33,150,243);
+}
+.switchbtn:hover:enabled{
+  box-shadow: 1px 1px 10px 1px rgb(33,150,243);
 }

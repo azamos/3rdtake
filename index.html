@@ -14,18 +14,18 @@
     <div class="addtaskcontainer">
         <div class="addtask">
             Add a task:
-            <input autocomplete="off" id="taskInput" style="width: 30%;" name="taskinput" type="text" maxlength="30" placeholder="Enter task details here"/>
-            <button disabled id ="submitBtn">Submit</button>
+            <input autocomplete="off" id="taskInput" style="width: 50%;font-size: x-large;" name="taskinput" type="text" maxlength="30" placeholder="Enter task details here"/>
+            <button class="sbtbt" disabled id ="submitBtn">Submit</button>
         </div>
     </div>
     <div id="tasksAnchor" class="grid-container">
         <div class="template grid-container grid-item hidden">
             <div class="title">Task #1</div>
-            <div class="content" style="word-break: break-all;">Task Description goes here- up  to 30 chars</div>
-            <div class="function-btns ">
-                <button style="font-size: xx-large;" class="btn transparent">&#128316;</button>
-                <button style="font-size: xx-large;" class="btn transparent" disabled>&#128317;</button>
-                <button style="font-size: xx-large;" class="delete-btn  redbg"> Delete</button>
+            <div class="content" style="word-break: break-all;margin-left: 10%;margin-right: 10%;box-shadow: 0px 2px 0px 0px lightgray;">Task Description goes here- up  to 30 chars</div>
+            <div class="function-btns" style="padding: 10px;">
+                <button style="font-size: xx-large;" class="switchbtn transparent">Up &#128316;</button>
+                <button style="font-size: xx-large;" class="switchbtn transparent" disabled>Dn &#128317;</button>
+                <button style="font-size: xx-large;" class="delete-btn redbg"> Delete</button>
             </div>
         </div>
     </div>
