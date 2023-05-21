@@ -1,7 +1,7 @@
 console.log("index.js loaded");
 const state = {
     inputValue:"",
-    tasks: {},
+    tasks: [],
     submitBtnEnabled: false
 }
 
@@ -42,10 +42,10 @@ const inputChangedHandler = (e,btn) => {
 }
 const submitBtnHandler = (e,taskTemplate,anchorPoint) => {
     const newTask = taskTemplate.cloneNode(true);
-
+    const newIndex = state.tasks.length;
     const {children} = newTask;
-    const id = `TASK#${Object.keys(state.tasks).length+1}`;
-    const newTaskData = new Task(id,state.inputValue);
+    const id = `TASK#${newIndex+1}`;
+    const newTaskData = new Task(newIndex,id,state.inputValue);
     children[0].innerText = newTaskData.id;
     children[1].innerText = newTaskData.content;
 
@@ -55,32 +55,38 @@ const submitBtnHandler = (e,taskTemplate,anchorPoint) => {
     newTask.classList.remove('hidden');
     newTask.setAttribute('id',newTaskData.id);
     anchorPoint.append(newTask);
-    deleteBtn.addEventListener('click',e=>deleteTask(e,anchorPoint,newTask))
-    state.tasks[`${newTaskData.id}`] = newTaskData;
+
+    newTaskData.setHTMLRef(newTask);
+    
+    deleteBtn.addEventListener('click',e=>deleteTask(e,anchorPoint,newTaskData))
+    state.tasks.push(newTaskData);
+
+    const upBtn = buttons[0];
+    const dnBtn = buttons[1];
+    if(newIndex==0){
+        upBtn.setAttribute('disabled',true);
+    }
+    if(newIndex>0){
+        console.log(state.tasks[newIndex-1].HTMLRef.children[2].children[1]);
+        state.tasks[newIndex-1].HTMLRef.children[2].children[1].removeAttribute('disabled');
+    }
 };
 
-const deleteTask = (e,anchor,taskHTMLRef) => {
+const deleteTask = (e,anchor,newTaskData) => {
     
-    anchor.removeChild(taskHTMLRef);
-    console.log('before state change: ');
-    console.log(state.tasks);
-    delete(state.tasks[taskHTMLRef.id]);
-    console.log('after state change');
-    console.log(state.tasks);
+    anchor.removeChild(newTaskData.HTMLRef);
+    state.tasks.splice(newTaskData.index,1);
 }
 
 //For clarity
 class Task{
-    constructor(id,content){
+    constructor(index,id,content){
+        this.index = index;
         this.id = id;
         this.content = content;
+        this.HTMLRef = null;
     }
-    setId(newId){
-        this.id = newId;
-    }
-    swapOrder(otherTask){
-        temp = this.order;
-        this.order = otherTask.order;
-        otherTask.order = temp;
+    setHTMLRef(val){
+        this.HTMLRef = val;
     }
 }
