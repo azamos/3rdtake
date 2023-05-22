@@ -75,3 +75,9 @@
 .switchbtn:hover:enabled{
   box-shadow: 1px 1px 10px 1px rgb(33,150,243);
 }
+.xxl-font{
+  font-size: xx-large;
+}
+.content{
+  word-break: break-all;margin-left: 10%;margin-right: 10%;box-shadow: 0px 2px 0px 0px lightgray;
+}

@@ -1,4 +1,4 @@
-console.log("index.js loaded");
+
 const state = {
     inputValue:"",
     tasks: [],
@@ -15,17 +15,12 @@ const subBtnStateNeedsToChange = () => {
 }
 
 function main(){
-    console.log("document.body has loaded");
-    console.log("initial state is: ",state);
     const inputRef = document.getElementById("taskInput");
     inputRef.value = state.inputValue;
     const submitBtn = document.getElementById("submitBtn");
-    
     inputRef.addEventListener('input',e=>inputChangedHandler(e,submitBtn));
-
     const tasksContainer = document.getElementById('tasksAnchor');
-    const templateRef = document.getElementsByClassName('template')[0];
-    submitBtn.addEventListener('click',e=>submitBtnHandler(e,templateRef,tasksContainer,inputRef));
+    submitBtn.addEventListener('click',e=>submitBtnHandler(e,tasksContainer,inputRef));
 }
 
 const resetInputValue = (inputHTMLref,subBtnHTMLref) => {
@@ -49,46 +44,75 @@ const inputChangedHandler = (e,btn) => {
         }
     }
 }
-const submitBtnHandler = (e,taskTemplate,anchorPoint,inputHTMLref) => {
+
+const generateTaskHTML = (anchorPoint,taskData) => {//Pure HTML structure. Logic elsewhere
+    const {index,content,id} = taskData;
+
+    const taskDiv = document.createElement('div');
+    taskDiv.setAttribute('class','grid-container grid-item');
+
+    const titleDiv = document.createElement('div');
+    titleDiv.setAttribute('class','title');
+    const titleSpan = document.createElement('span');
+    titleSpan.innerHTML=`TASK#${index+1}`;
+    titleDiv.appendChild(titleSpan);
+    
+    const deleteBtn = document.createElement('button');
+    deleteBtn.setAttribute('class',"delete-btn transparent xxl-font setright")
+    deleteBtn.addEventListener('click',e=>deleteTask(e,anchorPoint,taskData))
+    deleteBtn.innerHTML="&#10060;";
+    
+    titleDiv.appendChild(deleteBtn);
+    taskDiv.appendChild(titleDiv);
+
+    const contentDiv = document.createElement('div');
+    contentDiv.setAttribute('class',"content");
+    contentDiv.innerHTML = `Description: ${content}`;
+
+    taskDiv.appendChild(contentDiv);
+
+    const navigationBtnsDiv = document.createElement('div');
+    const upBtn = document.createElement('button');
+    upBtn.innerHTML = "Up &#128316;";
+    const dnBtn = document.createElement('button');
+    dnBtn.innerHTML = "Dn &#128317;";
+    upBtn.setAttribute('class',"switchbtn transparent xxl-font");
+    dnBtn.setAttribute('class',"switchbtn transparent xxl-font");
+    upBtn.addEventListener('click',e=>swapUp(e,taskData));
+    dnBtn.addEventListener('click',e=>swapDn(e,taskData))
+
+    navigationBtnsDiv.appendChild(upBtn);
+    navigationBtnsDiv.appendChild(dnBtn);
+
+    taskDiv.appendChild(navigationBtnsDiv);
+    taskDiv.setAttribute('id',id);
+
+    return taskDiv;
+};
+
+const submitBtnHandler = (e,anchorPoint,inputHTMLref) => {
     const subBtnRef = e.target;
-    const newTask = taskTemplate.cloneNode(true);
     const newIndex = state.tasks.length;
-    const {children} = newTask;
     const id = `TASK#${newIndex+1}`;
     const newTaskData = new Task(newIndex,id,state.inputValue);
-    children[0].innerText = newTaskData.id;
-    children[1].innerText = newTaskData.content;
 
-    const buttons = children[2].children;
-    const deleteBtn = buttons[2];
+    //here we connect the newTask to the htmlpage
+    const taskHTML = generateTaskHTML(anchorPoint,newTaskData);
+    anchorPoint.append(taskHTML);
+    newTaskData.setHTMLRef(taskHTML);//Consider removing this?    
+    state.tasks.push(newTaskData)//updating state;
 
-
-    newTask.classList.remove('hidden');
-    newTask.setAttribute('id',newTaskData.id);
-    anchorPoint.append(newTask);
-
-    newTaskData.setHTMLRef(newTask);
-    
-    deleteBtn.addEventListener('click',e=>deleteTask(e,anchorPoint,newTaskData))
-    state.tasks.push(newTaskData);
-
+    //setting which nav btns are are enabled.The delet btn is always enabled
     setValidBtns(newTaskData);
     if(newIndex>0){
         setValidBtns(state.tasks[newIndex-1]);
     }
     resetInputValue(inputHTMLref,subBtnRef);
-
-    const dnbtn = buttons[1];
-    dnbtn.addEventListener('click',e=>swapDn(e,newTaskData));
-    const upbtn = buttons[0];
-    upbtn.addEventListener('click',e=>swapUp(e,newTaskData));
 };
 
 const setValidBtns = task => {
     const {index,HTMLRef} = task;
     const buttons = HTMLRef.children[2].children;
-    console.log('btns');
-    console.log(buttons);
     const upbtn = buttons[0];
     const dnbtn = buttons[1];
 
@@ -127,7 +151,7 @@ const deleteTask = (e,anchor,newTaskData) => {
     let i;
     for(i=0;i<n;i++){
         state.tasks[i].setIndex(i);
-        state.tasks[i].HTMLRef.children[0].innerText = `TASK#${i+1}`;
+        state.tasks[i].HTMLRef.children[0].children[0].innerText = `TASK#${i+1}`;
         setValidBtns(state.tasks[i]);
     }
 }
@@ -151,8 +175,8 @@ function swapNeighbours(task1,task2){
     tasks[index2] = task1;
     tasks[index1].setIndex(index1);
     tasks[index2].setIndex(index2);
-    tasks[index1].HTMLRef.children[0].innerText = `TASK#${index1+1}`;
-    tasks[index2].HTMLRef.children[0].innerText = `TASK#${index2+1}`;
+    tasks[index1].HTMLRef.children[0].children[0].innerText = `TASK#${index1+1}`;
+    tasks[index2].HTMLRef.children[0].children[0].innerText = `TASK#${index2+1}`;
 
 
     //second, HTML elements swap
@@ -162,15 +186,7 @@ function swapNeighbours(task1,task2){
     setValidBtns(task2);
 }
 
-// const renderTasks = anchorPoint => {
-//     const { tasks } = state;
-//     const taskNodeList = tasks.map(task=>createHTMLtaskElement(task));
-//     taskNodeList.forEach(element => {
-//         anchorPoint.appendChild(element);
-//     });
-// };
-
-//For clarity
+//To give structure to the Task data, for ease of understanding
 class Task{
     constructor(index,id,content){
         this.index = index;
